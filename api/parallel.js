@@ -10,12 +10,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { scenario } = req.body;
+    let scenario = "No scenario provided";
+    
+    // Handle both GET and POST requests
+    if (req.method === 'POST') {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      scenario = body.scenario || scenario;
+    }
 
     const timelines = [
       {
         title: "Positive Outcome",
-        narrative: `Based on your scenario "${scenario || 'your situation'}", this positive path would lead to wonderful opportunities and personal growth.`,
+        narrative: `Based on your scenario "${scenario}", this positive path would lead to wonderful opportunities and personal growth.`,
         outcome_type: "positive",
         confidence_score: 85
       },
@@ -33,8 +39,8 @@ export default async function handler(req, res) {
       }
     ];
 
-    res.status(200).json({ timelines });
+    res.status(200).json({ timelines, received_scenario: scenario });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+} 
